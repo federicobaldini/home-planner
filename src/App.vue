@@ -9,17 +9,39 @@
           :key="v.value"
           :class="['toggle-btn', { active: store.view === v.value }]"
           @click="store.view = v.value"
-        >{{ v.label }}</button>
+        >
+          {{ v.label }}
+        </button>
       </div>
-      <span class="hint">Clicca per selezionare • Trascina per spostare • ↔ inverte apertura</span>
+      <span class="hint"
+        >Clicca per selezionare • Trascina per spostare • ↔ inverte
+        apertura</span
+      >
 
       <div class="save-btns">
-        <button class="save-btn" title="Salva come file JSON" @click="store.exportPlan()">💾 Salva</button>
+        <button
+          class="save-btn"
+          title="Salva come file JSON"
+          @click="store.exportPlan()"
+        >
+          💾 Salva
+        </button>
         <label class="save-btn" title="Carica un file JSON">
           📂 Carica
-          <input type="file" accept=".json,application/json,text/plain" hidden @change="onImport">
+          <input
+            type="file"
+            accept=".json,application/json,text/plain"
+            hidden
+            @change="onImport"
+          />
         </label>
-        <button class="save-btn danger" title="Rimuovi tutti i mobili" @click="onClear">🗑</button>
+        <button
+          class="save-btn danger"
+          title="Rimuovi tutti i mobili"
+          @click="onClear"
+        >
+          🗑
+        </button>
       </div>
     </header>
 
@@ -52,33 +74,49 @@
 </template>
 
 <script setup lang="ts">
-import { usePlannerStore } from './stores/plannerStore'
-import FurnitureSidebar from './components/FurnitureSidebar.vue'
-import FloorPlan2D from './components/FloorPlan2D.vue'
-import FloorPlan3D from './components/FloorPlan3D.vue'
+import { usePlannerStore } from "./stores/plannerStore";
+import { onMounted } from "vue";
+import FurnitureSidebar from "./components/FurnitureSidebar.vue";
+import FloorPlan2D from "./components/FloorPlan2D.vue";
+import FloorPlan3D from "./components/FloorPlan3D.vue";
+import defaultPlan from "./assets/home-plan.json";
 
-const store = usePlannerStore()
+const store = usePlannerStore();
 
 const views = [
-  { value: 'both' as const, label: '2D + 3D' },
-  { value: '2d' as const,   label: 'Solo 2D' },
-  { value: '3d' as const,   label: 'Solo 3D' },
-]
+  { value: "both" as const, label: "2D + 3D" },
+  { value: "2d" as const, label: "Solo 2D" },
+  { value: "3d" as const, label: "Solo 3D" },
+];
 
 function onImport(e: Event) {
-  const file = (e.target as HTMLInputElement).files?.[0]
-  if (file) store.importPlan(file)
-  ;(e.target as HTMLInputElement).value = ''
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (file) store.importPlan(file);
+  (e.target as HTMLInputElement).value = "";
 }
 
 function onClear() {
-  if (confirm('Rimuovere tutti i mobili?')) store.clearPlan()
+  if (confirm("Rimuovere tutti i mobili?")) store.clearPlan();
 }
+
+onMounted(() => {
+  if (defaultPlan) {
+    store.loadPlanData(defaultPlan);
+  }
+});
 </script>
 
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0f172a; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: #0f172a;
+}
 </style>
 
 <style scoped>
@@ -109,7 +147,10 @@ body { background: #0f172a; }
   margin-right: 8px;
 }
 
-.view-toggle { display: flex; gap: 4px; }
+.view-toggle {
+  display: flex;
+  gap: 4px;
+}
 
 .toggle-btn {
   padding: 5px 12px;
@@ -121,8 +162,14 @@ body { background: #0f172a; }
   cursor: pointer;
   font-weight: 600;
 }
-.toggle-btn.active { background: #1d4ed8; color: white; border-color: #1d4ed8; }
-.toggle-btn:hover:not(.active) { background: #1e293b; }
+.toggle-btn.active {
+  background: #1d4ed8;
+  color: white;
+  border-color: #1d4ed8;
+}
+.toggle-btn:hover:not(.active) {
+  background: #1e293b;
+}
 
 .hint {
   font-size: 11px;
@@ -130,7 +177,10 @@ body { background: #0f172a; }
   margin-left: auto;
 }
 
-.save-btns { display: flex; gap: 4px; }
+.save-btns {
+  display: flex;
+  gap: 4px;
+}
 
 .save-btn {
   display: inline-flex;
@@ -145,9 +195,16 @@ body { background: #0f172a; }
   cursor: pointer;
   white-space: nowrap;
 }
-.save-btn:hover { background: #334155; }
-.save-btn.danger { border-color: #7f1d1d; color: #fca5a5; }
-.save-btn.danger:hover { background: #7f1d1d; }
+.save-btn:hover {
+  background: #334155;
+}
+.save-btn.danger {
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+.save-btn.danger:hover {
+  background: #7f1d1d;
+}
 
 .main {
   display: flex;
@@ -167,8 +224,12 @@ body { background: #0f172a; }
   overflow: hidden;
   border-left: 1px solid #334155;
 }
-.panel.half { flex: 1; }
-.panel.full { flex: 1; }
+.panel.half {
+  flex: 1;
+}
+.panel.full {
+  flex: 1;
+}
 
 .panel-label {
   padding: 4px 12px;
@@ -187,4 +248,3 @@ body { background: #0f172a; }
   min-height: 0;
 }
 </style>
-
