@@ -108,6 +108,7 @@ export const FURNITURE_CATALOG: FurnitureCatalogItem[] = [
   { id: 'lampada_tavolo_comodino',   label: 'Lampada comodino',          category: 'Lampade', w: 0.2,  d: 0.2,  h: 0.4,  color: '#fef9c3', icon: '💡' },
   { id: 'lampada_arco',              label: 'Lampada ad arco',           category: 'Lampade', w: 0.4,  d: 1.6,  h: 2.0,  color: '#fde047', icon: '💡' },
   { id: 'abat_jour',                 label: 'Abat-jour',                 category: 'Lampade', w: 0.25, d: 0.25, h: 0.5,  color: '#fef3c7', icon: '💡' },
+  { id: 'plafoniera',                label: 'Plafoniera',                category: 'Lampade', w: 0.45, d: 0.45, h: 0.20, elevation: 2.8,   color: '#fef9c3', icon: '💡' },
   // Piante
   { id: 'pianta_piccola',            label: 'Pianta piccola',            category: 'Piante', w: 0.2,  d: 0.2,  h: 0.4,  color: '#4ade80', icon: '🌿' },
   { id: 'pianta_media',              label: 'Pianta media',              category: 'Piante', w: 0.4,  d: 0.4,  h: 0.9,  color: '#22c55e', icon: '🌿' },

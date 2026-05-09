@@ -23,7 +23,7 @@
       </label>
       <label>
         <span>Ora {{ formattedHour }}</span>
-        <input v-model.number="timeOfDay" type="range" min="6" max="20" step="0.25">
+        <input v-model.number="timeOfDay" type="range" min="0" max="24" step="0.25">
       </label>
     </div>
 
@@ -35,6 +35,7 @@
       <WalkControls  v-if=" walkMode" :active="walkMode" :lock-target="containerRef" @exit="exitWalk" />
 
       <TresAmbientLight :intensity="ambientIntensity" />
+      <TresHemisphereLight color="#dbeafe" ground-color="#d4b896" :intensity="hemiIntensity" />
       <TresDirectionalLight
         :position="sunPosition"
         :intensity="sunIntensity"
@@ -48,7 +49,7 @@
         :shadow-camera-near="1"
         :shadow-camera-far="40"
       />
-      <TresMesh :position="sunMarkerPosition">
+      <TresMesh v-if="sunPath.altitude >= 0" :position="sunMarkerPosition">
         <TresSphereGeometry :args="[0.18, 24, 16]" />
         <TresMeshBasicMaterial color="#facc15" />
       </TresMesh>
@@ -59,6 +60,12 @@
         <TresMesh :rotation="[-Math.PI / 2, 0, 0]" :position="[BW / 2, 0, BD / 2]" receive-shadow>
           <TresPlaneGeometry :args="[BW, BD]" />
           <TresMeshStandardMaterial color="#d6d3d1" :side="THREE.DoubleSide" />
+        </TresMesh>
+
+        <!-- Ceiling (only in walk/first-person mode) — box to block directional light -->
+        <TresMesh v-if="walkMode" :position="[BW / 2, H + 0.025, BD / 2]" cast-shadow receive-shadow>
+          <TresBoxGeometry :args="[BW, 0.05, BD]" />
+          <TresMeshStandardMaterial color="#f5f5f4" />
         </TresMesh>
 
         <!-- Room floor color patches -->
@@ -166,23 +173,35 @@ function exitWalk()  { walkMode.value = false; camKey.value++ }
 // ─── Sun controls ───────────────────────────────────────────────────────────
 
 const formattedHour = computed(() => {
-  const h = Math.floor(timeOfDay.value)
-  const m = Math.round((timeOfDay.value - h) * 60)
+  const wrapped = timeOfDay.value % 24
+  const h = Math.floor(wrapped)
+  const m = Math.round((wrapped - h) * 60)
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 })
 
 const sunPath = computed(() => {
-  const dayProgress = Math.min(1, Math.max(0, (timeOfDay.value - 6) / 14))
-  const morningToNoon = Math.min(1, dayProgress / 0.5)
-  const noonToEvening = Math.max(0, (dayProgress - 0.5) / 0.5)
-  const altitude = Math.max(0.08, Math.sin(dayProgress * Math.PI) * 0.95)
-  // True compass azimuths for Italy-ish sun path:
-  // morning from E/SE, noon on South, afternoon toward W/SW.
-  const compassAzimuth = dayProgress <= 0.5
-    ? 115 + morningToNoon * 65
-    : 180 + noonToEvening * 65
-  // Rotate true compass over the plan: with northDeg=90, North is right,
-  // South is the long side, East is the short/back side.
+  const t = timeOfDay.value % 24  // normalise 24 → 0
+  const isDay = t >= 6 && t <= 20
+
+  let altitude: number
+  let compassAzimuth: number
+
+  if (isDay) {
+    const dayProgress = (t - 6) / 14  // 0→1
+    const morningToNoon = Math.min(1, dayProgress / 0.5)
+    const noonToEvening = Math.max(0, (dayProgress - 0.5) / 0.5)
+    altitude = Math.sin(dayProgress * Math.PI) * 0.95
+    compassAzimuth = dayProgress <= 0.5
+      ? 115 + morningToNoon * 65
+      : 180 + noonToEvening * 65
+  } else {
+    // Night arc: from 20:00 → midnight (1:00) → 6:00, deepest at ~1:00 AM
+    // Remap t so that nightProgress goes 0→1→0 across the 10h night
+    const nightT = t >= 20 ? t - 20 : t + 4  // 0 at 20:00, 5 at 1:00, 10 at 6:00
+    altitude = -Math.sin((nightT / 10) * Math.PI) * 0.70
+    compassAzimuth = 295  // sun on north/opposite side at night
+  }
+
   const azimuth = (compassAzimuth + northDeg.value) * Math.PI / 180
   const radius = 18
   const x = BW / 2 + Math.sin(azimuth) * radius
@@ -193,9 +212,16 @@ const sunPath = computed(() => {
 
 const sunPosition = computed((): V3 => [sunPath.value.x, sunPath.value.y, sunPath.value.z])
 const sunMarkerPosition = computed((): V3 => [sunPath.value.x, sunPath.value.y + 0.35, sunPath.value.z])
-const sunIntensity = computed(() => 0.55 + sunPath.value.altitude * 1.25)
-const ambientIntensity = computed(() => 0.28 + sunPath.value.altitude * 0.38)
-const skyColor = computed(() => sunPath.value.altitude < 0.25 ? '#cbd5e1' : '#e2e8f0')
+const sunIntensity     = computed(() => Math.max(0,    0.55 + sunPath.value.altitude * 1.25))
+const ambientIntensity = computed(() => Math.max(0.03, 0.28 + sunPath.value.altitude * 0.48))
+const hemiIntensity    = computed(() => Math.max(0.02, 0.25 + sunPath.value.altitude * 0.40))
+const skyColor = computed(() => {
+  const alt = sunPath.value.altitude
+  if (alt < -0.15) return '#0f172a'  // notte profonda
+  if (alt <  0)    return '#1e293b'  // crepuscolo/alba
+  if (alt <  0.25) return '#cbd5e1'  // luce radente
+  return '#e2e8f0'
+})
 
 // ─── Scene data ──────────────────────────────────────────────────────────────
 

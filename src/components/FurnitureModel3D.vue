@@ -495,8 +495,25 @@
       </TresMesh>
       <TresMesh :position="[0, g.top - g.h*0.12, 0]">
         <TresCylinderGeometry :args="[g.w*0.32, g.w*0.44, g.h*0.26, 16]" />
-        <TresMeshStandardMaterial color="#f5e8c0" :roughness="0.88" :side="2" v-bind="sel" />
+        <TresMeshStandardMaterial color="#f5e8c0" :roughness="0.88" :emissive="'#ffe0a0'" :emissiveIntensity="0.55" :side="2" />
       </TresMesh>
+      <TresPointLight :position="[0, g.top - g.h*0.12, 0]" color="#fff4d6" :intensity="1.8" :distance="6" :decay="2" />
+    </template>
+
+    <!-- ═══ PLAFONIERA ════════════════════════════════════════════════════════ -->
+    <template v-else-if="kind === 'plafoniera'">
+      <!-- Corpo principale -->
+      <TresMesh :position="[0, g.top - g.h*0.38, 0]">
+        <TresCylinderGeometry :args="[g.hw*0.88, g.hw, g.h*0.72, 32]" />
+        <TresMeshStandardMaterial color="#f0ede8" :roughness="0.65" :side="2" v-bind="sel" />
+      </TresMesh>
+      <!-- Diffusore emissivo (faccia inferiore) -->
+      <TresMesh :position="[0, g.bot + 0.012, 0]" :rotation="[-Math.PI/2, 0, 0]">
+        <TresCylinderGeometry :args="[g.hw*0.80, g.hw*0.80, 0.022, 32]" />
+        <TresMeshStandardMaterial color="#fffde8" :roughness="0.2" :transparent="true" :opacity="0.92" :emissive="'#ffe8a0'" :emissiveIntensity="0.8" :side="2" />
+      </TresMesh>
+      <!-- Luce puntiforme verso il basso -->
+      <TresPointLight :position="[0, g.bot - 0.05, 0]" color="#fff8e7" :intensity="3.0" :distance="8" :decay="2" />
     </template>
 
     <!-- ═══ TV A MURO ══════════════════════════════════════════════════════════ -->
@@ -684,6 +701,7 @@ function getKind(id: string): string {
   if (id.startsWith('doccia'))        return 'doccia'
   if (id === 'lavabo' || id === 'lavabo_doppio' || id === 'mobile_bagno') return 'lavabo_bagno'
   if (id === 'lavatrice' || id === 'asciugatrice') return 'lavatrice'
+  if (id === 'plafoniera')                              return 'plafoniera'
   if (id.startsWith('lampada_') || id === 'abat_jour') return 'lampada'
   if (id === 'tv_piccola' || id === 'tv_media' || id === 'tv_grande' || id === 'tv_molto_grande') return 'tv_muro'
   if (id.startsWith('tv_stand'))      return 'tv_stand'
