@@ -158,19 +158,6 @@
       "wallId": "w02"
     },
     {
-      "uid": "porta_singola_1778269326430",
-      "catalogId": "porta_singola",
-      "label": "Porta singola",
-      "x": 0.972435424354243,
-      "z": 0,
-      "w": 0.7,
-      "d": 0.08,
-      "h": 2,
-      "rotation": 0,
-      "color": "#d4a574",
-      "wallId": "w13"
-    },
-    {
       "uid": "porta_singola_1778269349379",
       "catalogId": "porta_singola",
       "label": "Porta singola",
@@ -1052,7 +1039,7 @@
       "d": 1.4,
       "h": 2,
       "elevation": 0,
-      "rotation": 1,
+      "rotation": 0,
       "color": "#d6b98c",
       "wallId": "w12"
     },
@@ -1167,6 +1154,34 @@
       "rotation": 0,
       "color": "#fef9c3",
       "wallId": null
+    },
+    {
+      "uid": "finestra_singola_1778316482794",
+      "catalogId": "finestra_singola",
+      "label": "Finestra singola",
+      "x": 4.481476014760148,
+      "z": 13.05,
+      "w": 0.85,
+      "d": 0.08,
+      "h": 1.3,
+      "elevation": 0,
+      "rotation": 0,
+      "color": "#f8fafc",
+      "wallId": "w10"
+    },
+    {
+      "uid": "porta_doppia_1778316491877",
+      "catalogId": "porta_doppia",
+      "label": "Porta doppia",
+      "x": 1.0779704797047966,
+      "z": 0,
+      "w": 1.4,
+      "d": 0.08,
+      "h": 2,
+      "elevation": 0,
+      "rotation": 0,
+      "color": "#d6b98c",
+      "wallId": "w13"
     }
   ]
 }
